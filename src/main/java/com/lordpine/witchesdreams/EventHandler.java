@@ -13,12 +13,15 @@ public class EventHandler {
     public void onChangeDimension(EntityJoinWorldEvent event) {
         if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
             EntityPlayer player = (EntityPlayer) event.entity;
+            WitchesDreams.LOG.info(player.inventory.getFirstEmptyStack());
             if (player.dimension == com.emoniph.witchery.util.Config.instance().dimensionDreamID) {
                 NBTTagList inventoryList = getOverworldInventory(player);
                 NBTTagList newInventoryList = (NBTTagList) inventoryList.copy();
                 int removedItems = 0;
                 for (int i = 0; i < inventoryList.tagCount(); i++) {
                     ItemStack stack = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
+                    // Prevent trying to add more items than fit in an inventory
+                    if (player.inventory.getFirstEmptyStack() == -1) break;
                     if (Config.isAllowedIntoSpiritWorld(stack) && player.inventory.addItemStackToInventory(stack)) {
                         newInventoryList.removeTag(i - removedItems);
                         removedItems++;
@@ -31,6 +34,8 @@ public class EventHandler {
                 int removedItems = 0;
                 for (int i = 0; i < inventoryList.tagCount(); i++) {
                     ItemStack stack = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
+                    // Prevent trying to add more items than fit in an inventory
+                    if (player.inventory.getFirstEmptyStack() == -1) break;
                     if (Config.isAllowedFromSpiritWorld(stack) && player.inventory.addItemStackToInventory(stack)) {
                         newInventoryList.removeTag(i - removedItems);
                         removedItems++;
