@@ -22,7 +22,11 @@ public class EventHandler {
                     ItemStack stack = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
                     // Prevent trying to add more items than fit in an inventory
                     if (player.inventory.getFirstEmptyStack() == -1) break;
+                    ItemStack conversion = Config.spiritWorldConversion(stack);
                     if (Config.isAllowedIntoSpiritWorld(stack) && player.inventory.addItemStackToInventory(stack)) {
+                        newInventoryList.removeTag(i - removedItems);
+                        removedItems++;
+                    } else if (conversion != null && player.inventory.addItemStackToInventory(conversion)) {
                         newInventoryList.removeTag(i - removedItems);
                         removedItems++;
                     }
@@ -36,7 +40,11 @@ public class EventHandler {
                     ItemStack stack = ItemStack.loadItemStackFromNBT(inventoryList.getCompoundTagAt(i));
                     // Prevent trying to add more items than fit in an inventory
                     if (player.inventory.getFirstEmptyStack() == -1) break;
+                    ItemStack conversion = Config.normalWorldConversion(stack);
                     if (Config.isAllowedFromSpiritWorld(stack) && player.inventory.addItemStackToInventory(stack)) {
+                        newInventoryList.removeTag(i - removedItems);
+                        removedItems++;
+                    } else if (conversion != null && player.inventory.addItemStackToInventory(conversion)) {
                         newInventoryList.removeTag(i - removedItems);
                         removedItems++;
                     }

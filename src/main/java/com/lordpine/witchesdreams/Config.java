@@ -2,18 +2,16 @@ package com.lordpine.witchesdreams;
 
 import java.io.File;
 
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.oredict.OreDictionary;
-
-import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Config {
 
     public static String[] movesBetweenWorlds = new String[] {};
     public static String[] allowedIntoSpiritWorld = new String[] {};
     public static String[] allowedFromSpiritWorld = new String[] {};
+    public static String[] spiritToNormalConversions = new String[] {};
+    public static String[] normalToSpiritConversions = new String[] {};
 
     public static void synchronizeConfiguration(File configFile) {
         Configuration configuration = new Configuration(configFile);
@@ -33,6 +31,20 @@ public class Config {
             Configuration.CATEGORY_GENERAL,
             new String[] {},
             "What items are allowed to return from the spirit world?");
+        spiritToNormalConversions = configuration.getStringList(
+            "spiritToNormalConversions",
+            Configuration.CATEGORY_GENERAL,
+            new String[] {},
+            "Items in this list get converted to a different item when going from the spirit world to some other place. Format:\n"
+                + "modid:itemid>modid2:itemid2\n"
+                + "The second of these items is the output of the conversion.");
+        normalToSpiritConversions = configuration.getStringList(
+            "normalToSpiritConversions",
+            Configuration.CATEGORY_GENERAL,
+            new String[] {},
+            "Items in this list get converted to a different item when going from the spirit world to some other place. Format:\n"
+                + "modid:itemid>modid2:itemid2\n"
+                + "The second of these items is the output of the conversion.");
 
         if (configuration.hasChanged()) {
             configuration.save();
@@ -40,44 +52,36 @@ public class Config {
     }
 
     public static boolean isAllowedIntoSpiritWorld(ItemStack stack) {
-        return isStackInArray(stack, movesBetweenWorlds) || isStackInArray(stack, allowedIntoSpiritWorld);
+        return ItemHelper.isStackInArray(stack, movesBetweenWorlds)
+            || ItemHelper.isStackInArray(stack, allowedIntoSpiritWorld);
     }
 
     public static boolean isAllowedFromSpiritWorld(ItemStack stack) {
-        return isStackInArray(stack, movesBetweenWorlds) || isStackInArray(stack, allowedFromSpiritWorld);
+        return ItemHelper.isStackInArray(stack, movesBetweenWorlds)
+            || ItemHelper.isStackInArray(stack, allowedFromSpiritWorld);
     }
 
-    private static boolean isStackInArray(ItemStack stack, String[] itemStrings) {
-        for (String itemString : itemStrings) {
-            itemString = itemString.replace("\"", "");
-            String[] splitString = itemString.split(":");
-            if (splitString.length < 2 || splitString.length > 3) {
-                WitchesDreams.LOG.warn(itemString + " is not a valid item ID, ignoring!");
-            }
-            // ore dictionary handling
-            if (splitString[0] == "ore" && OreDictionary.doesOreNameExist(splitString[1])) {
-                for (int ID : OreDictionary.getOreIDs(stack)) {
-                    if (OreDictionary.getOreID(splitString[1]) == ID) {
-                        return true;
-                    }
-                }
-            } else {
-                Item item = GameRegistry.findItem(splitString[0], splitString[1]);
-                if (stack.getItem()
-                    .equals(item)) {
-                    if (splitString.length == 3) {
-                        if (splitString[2] == "*") return true;
-                        try {
-                            if (Integer.parseInt(splitString[2]) == stack.getItemDamage()) {
-                                return true;
-                            }
-                        } catch (Exception ignored) {}
-                    } else if (stack.getItemDamage() == 0) {
-                        return true;
-                    }
-                }
+    public static ItemStack spiritWorldConversion(ItemStack stack) {
+        for (String conversion : normalToSpiritConversions) {
+            String[] splitConversion = conversion.split(">");
+            if (ItemHelper.matchesStack(stack, splitConversion[0])) {
+                ItemStack out = ItemHelper.createStackFromString(splitConversion[1]);
+                out.stackSize = stack.stackSize;
+                return out;
             }
         }
-        return false;
+        return null;
+    }
+
+    public static ItemStack normalWorldConversion(ItemStack stack) {
+        for (String conversion : spiritToNormalConversions) {
+            String[] splitConversion = conversion.split(">");
+            if (ItemHelper.matchesStack(stack, splitConversion[0])) {
+                ItemStack out = ItemHelper.createStackFromString(splitConversion[1]);
+                out.stackSize = stack.stackSize;
+                return out;
+            }
+        }
+        return null;
     }
 }
