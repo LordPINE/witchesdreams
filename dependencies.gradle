@@ -34,5 +34,5 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-        api("curse.maven:witchery-69673:2234410") { transitive = false }
+        devOnlyNonPublishable(rfg.deobf("curse.maven:witchery-69673:2234410")) { transitive = false }
 }
