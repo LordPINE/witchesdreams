@@ -36,7 +36,7 @@ public class ItemHelper {
             if (stack.getItem()
                 .equals(item)) {
                 if (splitString.length == 3) {
-                    if (splitString[2] == "*") return true;
+                    if (splitString[2].equals("*")) return true;
                     try {
                         if (Integer.parseInt(splitString[2]) == stack.getItemDamage()) {
                             return true;
