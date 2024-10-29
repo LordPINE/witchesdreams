@@ -25,16 +25,24 @@ public class ItemHelper {
             return false;
         }
         // ore dictionary handling
-        if (splitString[0] == "ore" && OreDictionary.doesOreNameExist(splitString[1])) {
-            for (int ID : OreDictionary.getOreIDs(stack)) {
-                if (OreDictionary.getOreID(splitString[1]) == ID) {
-                    return true;
+        if (splitString[0] == "ore") {
+            if (OreDictionary.doesOreNameExist(splitString[1])) {
+                for (int ID : OreDictionary.getOreIDs(stack)) {
+                    if (OreDictionary.getOreID(splitString[1]) == ID) {
+                        return true;
+                    }
                 }
+            } else {
+                WitchesDreams.LOG.warn(stackString + " is not a valid oredictionary entry, ignoring!");
+                return false;
             }
         } else {
             Item item = GameRegistry.findItem(splitString[0], splitString[1]);
-            if (stack.getItem()
-                .equals(item)) {
+            if (item == null) {
+                WitchesDreams.LOG.warn(stackString + " is not an existing item ID, ignoring!");
+                return false;
+            }
+            if (item.equals(stack.getItem())) {
                 if (splitString.length == 3) {
                     if (splitString[2].equals("*")) return true;
                     try {

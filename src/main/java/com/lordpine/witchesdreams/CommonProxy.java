@@ -1,5 +1,7 @@
 package com.lordpine.witchesdreams;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -20,8 +22,12 @@ public class CommonProxy {
 
     // postInit "Handle interaction with other mods, complete your setup based on this." (Remove if not needed)
     public void postInit(FMLPostInitializationEvent event) {
-        WitchesDreams.LOG.info("TEST");
         MinecraftForge.EVENT_BUS.register(new EventHandler());
+        // Test entries for validity
+        Config.isAllowedFromSpiritWorld(new ItemStack(Blocks.air));
+        Config.isAllowedIntoSpiritWorld(new ItemStack(Blocks.air));
+        Config.normalWorldConversion(new ItemStack(Blocks.air));
+        Config.spiritWorldConversion(new ItemStack(Blocks.air));
     }
 
     // register server commands in this event handler (Remove if not needed)

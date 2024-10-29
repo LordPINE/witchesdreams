@@ -13,7 +13,6 @@ public class EventHandler {
     public void onChangeDimension(EntityJoinWorldEvent event) {
         if (event.entity instanceof EntityPlayer && !event.world.isRemote) {
             EntityPlayer player = (EntityPlayer) event.entity;
-            WitchesDreams.LOG.info(player.inventory.getFirstEmptyStack());
             if (player.dimension == com.emoniph.witchery.util.Config.instance().dimensionDreamID) {
                 NBTTagList inventoryList = getOverworldInventory(player);
                 NBTTagList newInventoryList = (NBTTagList) inventoryList.copy();
